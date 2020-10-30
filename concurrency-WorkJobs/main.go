@@ -66,7 +66,7 @@ func main() {
 	}
 
 	if len(errGenQRCode) > 0 {
-		fmt.Println("gen qr code list : ", errGenQRCode)
+		fmt.Println("error gen qr code failure list : ", errGenQRCode)
 	}
 
 	wg.Wait()
