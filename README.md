@@ -3,6 +3,7 @@
 
 ## Prerequisite
 - GO v1.14
+- go get github.com/skip2/go-qrcode
 
 ## Implement
 - crate file and write to pin code, just like , 21QQ751672(file name) 751672(pin code)
