@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/skip2/go-qrcode"
 )
@@ -55,14 +57,19 @@ func main() {
 	for i := 0; i < fileContentCount; i++ {
 		go func(i int) {
 			defer wg.Done()
+			fmt.Printf("worker - %d: started, working\n", i)
 			work(fileContentArr[i], errGenQRCode)
-			jobs <- true
+			fmt.Printf("worker - %d: completed !\n", i)
+			<-jobs
 		}(i)
 	}
 
 	// collect job
 	for i := 0; i < fileContentCount; i++ {
-		<-jobs
+		name := fmt.Sprintf("job-%d", i)
+		duration := time.Duration(rand.Intn(1000)) * time.Millisecond
+		fmt.Printf("adding: %s %s\n", name, duration)
+		jobs <- true
 	}
 
 	if len(errGenQRCode) > 0 {
