@@ -77,6 +77,8 @@ func main() {
 		}
 	}
 
+	close(jobChans)
+
 	wg.Wait()
 
 	if len(errGenQRCode) > 0 {
