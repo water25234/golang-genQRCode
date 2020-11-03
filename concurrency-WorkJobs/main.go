@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -19,8 +20,6 @@ var (
 	pathPtr    = flag.String("path", "file", "a string")
 	fileExtPtr = flag.String("fileExt", ".png", "a string")
 )
-
-const maxWorkers = 10
 
 func main() {
 
@@ -54,17 +53,19 @@ func main() {
 	wg.Add(fileContentCount)
 
 	// start workers
-	go func() {
-		for job := range jobChans {
-			fmt.Printf("worker - %d: started, working\n", job.index)
-			errPinCode := work(job.fileContent)
-			if errPinCode != "" {
-				errGenQRCode = append(errGenQRCode, errPinCode)
+	for i := 0; i < runtime.NumCPU(); i++ {
+		go func() {
+			for job := range jobChans {
+				fmt.Printf("worker - %d: started, working\n", job.index)
+				errPinCode := work(job.fileContent)
+				if errPinCode != "" {
+					errGenQRCode = append(errGenQRCode, errPinCode)
+				}
+				fmt.Printf("worker - %d: completed !\n", job.index)
+				wg.Done()
 			}
-			fmt.Printf("worker - %d: completed !\n", job.index)
-			wg.Done()
-		}
-	}()
+		}()
+	}
 
 	// collect job
 	for i := 0; i < fileContentCount; i++ {
