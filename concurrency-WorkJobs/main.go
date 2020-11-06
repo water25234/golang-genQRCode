@@ -41,7 +41,7 @@ func main() {
 	str := string(b)
 	fileContentArr := strings.Split(str, "\n")
 	fileContentCount := len(fileContentArr)
-	var errGenQRCode []string
+	errGenQRCode := &errLog{}
 
 	os.Mkdir(*pathPtr, os.ModePerm)
 
@@ -53,18 +53,15 @@ func main() {
 	wg.Add(fileContentCount)
 
 	// start workers
-	for i := 0; i < runtime.NumCPU(); i++ {
-		go func() {
+	for i := 1; i <= runtime.NumCPU(); i++ {
+		go func(i int) {
 			for job := range jobChans {
-				fmt.Printf("worker - %d: started, working\n", job.index)
-				errPinCode := work(job.fileContent)
-				if errPinCode != "" {
-					errGenQRCode = append(errGenQRCode, errPinCode)
-				}
-				fmt.Printf("worker - %d: completed !\n", job.index)
+				fmt.Printf("worker - %d: started, working, CPU = %d \n", job.index, i)
+				work(job.fileContent, errGenQRCode)
+				fmt.Printf("worker - %d: completed !, CPU = %d \n", job.index, i)
 				wg.Done()
 			}
-		}()
+		}(i)
 	}
 
 	// collect job
@@ -82,8 +79,8 @@ func main() {
 
 	wg.Wait()
 
-	if len(errGenQRCode) > 0 {
-		fmt.Println("error gen qr code failure list : ", errGenQRCode)
+	if len(errGenQRCode.errGenQRCode) > 0 {
+		fmt.Println("error gen qr code failure list : ", errGenQRCode.errGenQRCode)
 	}
 
 	fmt.Println("--------------- finish work ---------------")
@@ -92,6 +89,10 @@ func main() {
 type jobChannel struct {
 	index       int
 	fileContent string
+}
+
+type errLog struct {
+	errGenQRCode []string
 }
 
 func pinCodeInfo(valueArr []string) (valueName string, valuePinCode string, err error) {
@@ -117,7 +118,7 @@ func fileSize(pingCode string) (size int64, err error) {
 	return fi.Size(), nil
 }
 
-func work(fileContent string) (errPinCode string) {
+func work(fileContent string, errGenQRCode *errLog) {
 
 	if len(fileContent) == 0 {
 		return
@@ -135,15 +136,17 @@ func work(fileContent string) (errPinCode string) {
 
 	if err != nil {
 		fmt.Println("gen QR Code failure", pingCode)
-		return pingCode
+		errGenQRCode.errGenQRCode = append(errGenQRCode.errGenQRCode, pingCode)
+		return
 	}
 
 	size, err := fileSize(pingCode)
 	if err != nil {
 		fmt.Println("get file size failure", pingCode)
-		return pingCode
+		errGenQRCode.errGenQRCode = append(errGenQRCode.errGenQRCode, pingCode)
+		return
 	}
 
 	fmt.Println(fmt.Sprintf("file: %s, file size: %d", pingCode, size))
-	return ""
+	return
 }
