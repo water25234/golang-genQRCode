@@ -18,6 +18,8 @@
 ```
 - command line
 ```
+go run main.go -r pinCodeFile.txt -f file -e .png
+
 go run main.go -file=pinCodeFile.txt -path=file -fileExt=.png
 
 -file: must be, write file.
