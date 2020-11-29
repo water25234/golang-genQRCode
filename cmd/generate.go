@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"os"
 	"runtime"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/skip2/go-qrcode"
 )
@@ -55,9 +53,9 @@ func (fs *flags) generateQRCode() error {
 	for i := 1; i <= runtime.NumCPU(); i++ {
 		go func(i int) {
 			for job := range jobChans {
-				fmt.Printf("worker - %d: started, working, CPU = %d \n", job.index, i)
+				// fmt.Printf("worker - %d: started, working, CPU = %d \n", job.index, i)
 				fs.work(job.fileContent, errGenQRCode)
-				fmt.Printf("worker - %d: completed !, CPU = %d \n", job.index, i)
+				// fmt.Printf("worker - %d: completed !, CPU = %d \n", job.index, i)
 				wg.Done()
 			}
 		}(i)
@@ -65,9 +63,9 @@ func (fs *flags) generateQRCode() error {
 
 	// collect job
 	for i := 0; i < fileContentCount; i++ {
-		name := fmt.Sprintf("job-%d", i)
-		duration := time.Duration(rand.Intn(1000)) * time.Millisecond
-		fmt.Printf("adding: %s %s\n", name, duration)
+		// name := fmt.Sprintf("job-%d", i)
+		// duration := time.Duration(rand.Intn(1000)) * time.Millisecond
+		// fmt.Printf("adding: %s %s\n", name, duration)
 		jobChans <- jobChannel{
 			index:       i,
 			fileContent: fileContentArr[i],
