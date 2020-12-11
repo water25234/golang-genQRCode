@@ -124,7 +124,7 @@ func work(fileContent string, errGenQRCode *errLog) {
 		return
 	}
 
-	valueArr := strings.Split(fileContent, " ")
+	valueArr := strings.Split(strings.TrimSpace(fileContent), " ")
 	valueName, valuePinCode, err := pinCodeInfo(valueArr)
 	if err != nil {
 		return

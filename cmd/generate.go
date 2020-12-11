@@ -113,7 +113,7 @@ func (fs *flags) work(fileContent string, errGenQRCode *errLog) {
 		return
 	}
 
-	valueArr := strings.Split(fileContent, " ")
+	valueArr := strings.Split(strings.TrimSpace(fileContent), " ")
 	valueName, valuePinCode, err := fs.pinCodeInfo(valueArr)
 	if err != nil {
 		return
