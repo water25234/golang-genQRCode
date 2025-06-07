@@ -1,6 +1,6 @@
 module github.com/water25234/golang-genQRCode
 
-go 1.15
+go 1.24
 
 require (
 	github.com/mitchellh/go-homedir v1.1.0
