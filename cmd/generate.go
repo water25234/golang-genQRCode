@@ -87,7 +87,6 @@ func (fs *flags) generateQRCode() error {
 func (fs *flags) fileSize(pingCode string) (size int64, err error) {
 	fi, err := os.Stat(pingCode)
 	if err != nil {
-		log.Fatal(err)
 		return 0, err
 	}
 	return fi.Size(), nil
