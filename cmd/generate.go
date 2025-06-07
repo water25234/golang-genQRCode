@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"runtime"
 	"strings"
@@ -26,13 +25,13 @@ func (fs *flags) generateQRCode() error {
 
 	file, err := os.Open(fs.readfile)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer file.Close()
 
 	b, err := ioutil.ReadAll(file)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	str := string(b)
@@ -40,7 +39,9 @@ func (fs *flags) generateQRCode() error {
 	fileContentCount := len(fileContentArr)
 	errGenQRCode := &errLog{}
 
-	os.Mkdir(fs.folder, os.ModePerm)
+	if err := os.MkdirAll(fs.folder, os.ModePerm); err != nil {
+		return err
+	}
 
 	// channel for job
 	jobChans := make(chan jobChannel, fileContentCount)
@@ -87,7 +88,6 @@ func (fs *flags) generateQRCode() error {
 func (fs *flags) fileSize(pingCode string) (size int64, err error) {
 	fi, err := os.Stat(pingCode)
 	if err != nil {
-		log.Fatal(err)
 		return 0, err
 	}
 	return fi.Size(), nil

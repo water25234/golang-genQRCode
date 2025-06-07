@@ -29,7 +29,7 @@ func main() {
 
 	file, err := os.Open(*filePtr)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("open %s: %v", *filePtr, err)
 	}
 	defer file.Close()
 
@@ -112,7 +112,6 @@ func pinCodeInfo(valueArr []string) (valueName string, valuePinCode string, err 
 func fileSize(pingCode string) (size int64, err error) {
 	fi, err := os.Stat(pingCode)
 	if err != nil {
-		log.Fatal(err)
 		return 0, err
 	}
 	return fi.Size(), nil
