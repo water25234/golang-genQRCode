@@ -37,8 +37,8 @@ type flags struct {
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&readfile, "readfile", "r", "", "read file content for pin code (default read pinCodeFile.txt)")
-	rootCmd.PersistentFlags().StringVarP(&folder, "folder", "f", "", "create folder (default folder name file)")
+	rootCmd.PersistentFlags().StringVarP(&readfile, "readfile", "r", "pinCodeFile.txt", "read file content for pin code (default pinCodeFile.txt)")
+	rootCmd.PersistentFlags().StringVarP(&folder, "folder", "f", "file", "create folder (default file)")
 	rootCmd.PersistentFlags().StringVarP(&fileExt, "fileExt", "e", ".png", "file extension (default .png)")
 }
 
