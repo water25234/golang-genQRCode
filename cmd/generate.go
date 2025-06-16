@@ -26,7 +26,7 @@ func (fs *flags) generateQRCode() error {
 
 	file, err := os.Open(fs.readfile)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer file.Close()
 
@@ -65,7 +65,7 @@ func (fs *flags) generateQRCode() error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	close(jobChans)
