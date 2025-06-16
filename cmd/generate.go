@@ -1,8 +1,8 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"runtime"
@@ -30,46 +30,42 @@ func (fs *flags) generateQRCode() error {
 	}
 	defer file.Close()
 
-	b, err := ioutil.ReadAll(file)
-	if err != nil {
-		log.Fatal(err)
-	}
+	scanner := bufio.NewScanner(file)
 
-	str := string(b)
-	fileContentArr := strings.Split(str, "\n")
-	fileContentCount := len(fileContentArr)
 	errGenQRCode := &errLog{}
 
 	os.Mkdir(fs.folder, os.ModePerm)
 
-	// channel for job
-	jobChans := make(chan jobChannel, fileContentCount)
+	// channel for job, size proportional to CPU
+	bufferSize := runtime.NumCPU() * 2
+	jobChans := make(chan jobChannel, bufferSize)
 
 	// start workers
 	wg := &sync.WaitGroup{}
-	wg.Add(fileContentCount)
 
-	// start workers
 	for i := 1; i <= runtime.NumCPU(); i++ {
 		go func(i int) {
 			for job := range jobChans {
-				// fmt.Printf("worker - %d: started, working, CPU = %d \n", job.index, i)
 				fs.work(job.fileContent, errGenQRCode)
-				// fmt.Printf("worker - %d: completed !, CPU = %d \n", job.index, i)
 				wg.Done()
 			}
 		}(i)
 	}
 
 	// collect job
-	for i := 0; i < fileContentCount; i++ {
-		// name := fmt.Sprintf("job-%d", i)
-		// duration := time.Duration(rand.Intn(1000)) * time.Millisecond
-		// fmt.Printf("adding: %s %s\n", name, duration)
+	index := 0
+	for scanner.Scan() {
+		line := scanner.Text()
+		wg.Add(1)
 		jobChans <- jobChannel{
-			index:       i,
-			fileContent: fileContentArr[i],
+			index:       index,
+			fileContent: line,
 		}
+		index++
+	}
+
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
 	}
 
 	close(jobChans)
@@ -82,15 +78,6 @@ func (fs *flags) generateQRCode() error {
 
 	fmt.Println("--------------- finish work ---------------")
 	return nil
-}
-
-func (fs *flags) fileSize(pingCode string) (size int64, err error) {
-	fi, err := os.Stat(pingCode)
-	if err != nil {
-		log.Fatal(err)
-		return 0, err
-	}
-	return fi.Size(), nil
 }
 
 func (fs *flags) pinCodeInfo(valueArr []string) (valueName string, valuePinCode string, err error) {
@@ -129,13 +116,6 @@ func (fs *flags) work(fileContent string, errGenQRCode *errLog) {
 		return
 	}
 
-	size, err := fs.fileSize(pingCode)
-	if err != nil {
-		fmt.Println("get file size failure", pingCode)
-		errGenQRCode.errGenQRCode = append(errGenQRCode.errGenQRCode, pingCode)
-		return
-	}
-
-	fmt.Println(fmt.Sprintf("file: %s, file size: %d", pingCode, size))
+	fmt.Println("generated", pingCode)
 	return
 }
