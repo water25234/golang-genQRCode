@@ -2,7 +2,7 @@
 - pin code to qr code image
 
 ## Prerequisite
-- GO v1.14
+- GO v1.24
 - go get github.com/skip2/go-qrcode
 
 ## Implement
