@@ -19,11 +19,13 @@
 
 ## 🔖 規範規則
 - PR 分支 **不得** 使用 `main`、`master`、`develop` 等保留名稱。  
-- 分支命名格式：`feature/<your-feature>` 或 `bugfix/<your-bugfix>`，且一律自 `develop` 建立。  
+- 分支命名格式：`feature/<your-feature>` 或 `bugfix/<your-bugfix>`，且一律自 `master` 建立。  
+- 檢查是否有異動程式碼, 有的話則使用 `feat:` 或 `fix:`，否則使用 `docs:`。
 - PR Title：簡要描述此次變更的模組或功能。  
 - PR Summary：條列這次變動重點，方便 reviewer 一目了然。  
 - 送出前先顯示 commit 內容供確認；確認後才執行 **`git commit`**。  
 - 再次顯示 push 資訊供確認；確認後執行 **`git push`** 並建立 Pull Request。  
+- push 完成後，AI 透過 GitHub CLI 執行  gh pr create --base develop --head <current-branch> --fill, 先預覽 Pull Request 的標題與內容，經人類確認後才正式建立 PR，並回傳網址。
 
 ---
 
